@@ -11,31 +11,54 @@ namespace MLHelpers.Text
     /// </summary>
     public class TextNormalizer : IDisposable
     {
-        private readonly MLContext _mlContext;
-        private readonly List<TextData> _emptySamplesList;
-        private readonly IDataView _emptyDataView;
+        private MLContext _mlContext;
+        private List<TextData> _emptySamplesList;
+        private IDataView _emptyDataView;
         
         // text normalization
-        private readonly TextNormalizingEstimator _normTextPipeline;
-        private readonly TextNormalizingTransformer _normTextTransformer;
-        private readonly PredictionEngine<TextData, TransformedTextData> _predictionEngine;
+        private TextNormalizingEstimator _normTextPipeline;
+        private TextNormalizingTransformer _normTextTransformer;
+        private PredictionEngine<TextData, TransformedTextData> _predictionEngine;
         
         public TextNormalizer()
+        {
+            InitializeTextNormalizer();            
+        }
+
+        public TextNormalizer(TextNormalizingEstimator.CaseMode caseMode = TextNormalizingEstimator.CaseMode.Lower,
+            bool keepDiacritics = false,
+            bool keepPuncuations = false,
+            bool keepNumbers = false)
+        {
+            InitializeTextNormalizer(caseMode, keepDiacritics, keepPuncuations, keepNumbers);
+        }
+
+        private void InitializeTextNormalizer(TextNormalizingEstimator.CaseMode caseMode = TextNormalizingEstimator.CaseMode.Lower,
+            bool keepDiacritics = false,
+            bool keepPuncuations = false,
+            bool keepNumbers = false)
         {
             _mlContext = new MLContext();
             _emptySamplesList = new List<TextData>();
             _emptyDataView = _mlContext.Data.LoadFromEnumerable(_emptySamplesList);
-            
+
             // text normalizer
             _normTextPipeline = _mlContext.Transforms.Text.NormalizeText("NormalizedText", "Text",
-                TextNormalizingEstimator.CaseMode.Lower,
-                keepDiacritics: false,
-                keepPunctuations: false,
-                keepNumbers: false);
+                caseMode,
+                keepDiacritics: keepDiacritics,
+                keepPunctuations: keepPuncuations,
+                keepNumbers: keepNumbers);
             _normTextTransformer = _normTextPipeline.Fit(_emptyDataView);
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(_normTextTransformer);
         }
 
+
+
+        /// <summary>
+        /// Normalize input text (.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public string NormalizeText(string text)
         {                               
             var data = new TextData() { Text = text };
@@ -57,7 +80,7 @@ namespace MLHelpers.Text
 
         public void Dispose()
         {
-            _predictionEngine?.Dispose();
+            _predictionEngine?.Dispose();            
         }
     }    
 }
