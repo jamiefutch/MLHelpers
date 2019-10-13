@@ -57,7 +57,8 @@ namespace MLHelpers.Text
                 {
                     var ng = new NGramModel
                     {
-                        NGram = slots[item.Key].ToString()
+                        NGramString = slots[item.Key].ToString()
+                        , NGramArray = slots[item.Key].ToString().Split('|')
                     };
                     retList.Add(ng);
                 }
@@ -103,16 +104,13 @@ namespace MLHelpers.Text
     }
     public class NGramModel
     {
-        public string NGram { get; set; }
+        public string NGramString { get; set; }
 
-        public string[] ToIndividualWords()
-        {
-            return NGram.Split("|");
-        }
-
+        public string[] NGramArray { get; set; }
+                
         public override string ToString()
         {
-            return NGram;
+            return NGramString;
         }
     }
 }

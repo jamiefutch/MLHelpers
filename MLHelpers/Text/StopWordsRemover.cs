@@ -8,17 +8,46 @@ namespace MLHelpers.Text
     public class StopWordsRemover : IDisposable
     {
 
-        private readonly MLContext _mlContext;
-        private readonly List<TextData> _emptySamplesList;
-        private readonly IDataView _emptyDataView;
+        private MLContext _mlContext;
+        private List<TextData> _emptySamplesList;
+        private IDataView _emptyDataView;
         
         // stop words
         private Microsoft.ML.Data.EstimatorChain<StopWordsRemovingTransformer> _stopWordsTextPipeline;
-        private readonly Microsoft.ML.Data.TransformerChain<StopWordsRemovingTransformer> _textPipeline;
-        private readonly PredictionEngine<TextData, TransformedTextData> _predictionEngine;
+        private Microsoft.ML.Data.TransformerChain<StopWordsRemovingTransformer> _textPipeline;
+        private PredictionEngine<TextData, TransformedTextData> _predictionEngine;
 
+        private removeStopWordswMode _mode;
 
+        private enum removeStopWordswMode
+        {
+            Custom = 0,
+            Default = 1
+        }
+
+        /// <summary>
+        /// constructor for default stopwords
+        /// </summary>
         public StopWordsRemover()
+        {
+            InitializeStopWordsRemover();    
+        }
+
+        /// <summary>
+        /// constructor for custom stop words
+        /// </summary>
+        /// <param name="stopWords"></param>
+        public StopWordsRemover(string[] stopWords)
+        {
+            InitializeStopWordsRemover(stopWords);
+        }
+
+
+        /// <summary>
+        /// Initialize (or reinitialize) the stopwords remover.  Also called by the constructor.
+        /// </summary>
+        /// <param name="CustomStopWords"></param>
+        public void InitializeStopWordsRemover(string[] CustomStopWords = null)
         {
             _mlContext = new MLContext();
             _emptySamplesList = new List<TextData>();
@@ -27,7 +56,21 @@ namespace MLHelpers.Text
             // stop words
             _stopWordsTextPipeline = _mlContext.Transforms.Text.TokenizeIntoWords("Words", "Text")
                 .Append(_mlContext.Transforms.Text.RemoveDefaultStopWords("WordsWithoutStopWords", "Words", language: StopWordsRemovingEstimator.Language.English));
-            _textPipeline = _stopWordsTextPipeline.Fit(_emptyDataView);
+
+            if (CustomStopWords == null)
+            {
+                _textPipeline = _stopWordsTextPipeline.Fit(_emptyDataView);
+                _mode = removeStopWordswMode.Default;
+            }
+            else
+            {
+                var textPipeline = _mlContext.Transforms.Text.TokenizeIntoWords("Words",
+                "Text")
+                .Append(_mlContext.Transforms.Text.RemoveStopWords(
+                "WordsWithoutStopWords", "Words", stopwords:
+                CustomStopWords));
+                _mode = removeStopWordswMode.Custom;
+            }
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(_textPipeline);
         }
 
@@ -54,6 +97,10 @@ namespace MLHelpers.Text
             return retString;
         }
 
+        public void ShowCurrentMode()
+        {
+            Console.WriteLine($"Stopwords remover Mode: {_mode.ToString()}");
+        }
 
         private class TextData
         {

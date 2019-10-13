@@ -55,7 +55,7 @@ namespace MLHelpers.Text
 
 
         /// <summary>
-        /// Normalize input text (.
+        /// Normalize input text.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
