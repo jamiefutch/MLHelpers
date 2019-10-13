@@ -31,21 +31,27 @@ namespace MLHelpers.Text
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(_textPipeline);
         }
 
-        public string RemoveStopWords(string comment)
+
+        /// <summary>
+        /// remove stop words from input string
+        /// </summary>
+        /// <param name="inputString"></param>
+        /// <returns></returns>
+        public string RemoveStopWords(string inputString)
         {
-            var data = new TextData() { Text = comment };
+            var data = new TextData() { Text = inputString };
             var prediction = _predictionEngine.Predict(data);
 
-            string retComment;
+            string retString;
             if (prediction.WordsWithoutStopWords != null)
             {
-                retComment = string.Join(" ", prediction.WordsWithoutStopWords);
+                retString = string.Join(" ", prediction.WordsWithoutStopWords);
             }
             else
             {
-                retComment = comment;
+                retString = inputString;
             }   
-            return retComment;
+            return retString;
         }
 
 

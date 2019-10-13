@@ -5,6 +5,10 @@ using Microsoft.ML.Transforms.Text;
 
 namespace MLHelpers.Text
 {
+
+    /// <summary>
+    /// Wrapper for ML.Net Text Normalizer
+    /// </summary>
     public class TextNormalizer : IDisposable
     {
         private readonly MLContext _mlContext;
