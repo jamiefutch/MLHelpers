@@ -5,6 +5,7 @@ namespace NGramTest
 {
     class Program
     {
+        // ReSharper disable once UnusedParameter.Local
         static void Main(string[] args)
         {
             const string kText =
@@ -30,8 +31,15 @@ namespace NGramTest
             Console.WriteLine("Normalized and Stop words removed text:");
             Console.WriteLine(stopWordsRemoved);
             Console.WriteLine("\n\n\n");
+
+            var normalizedWithoutStopWordsRemoved = normalizer.NormalizeText(kText);
+            Console.WriteLine("Normalized and Stop words NOT removed text:");
+            Console.WriteLine(normalizedWithoutStopWordsRemoved);
+            Console.WriteLine("\n\n\n");
+
             var ngrams2 = ngs.GenerateNGrams(stopWordsRemoved);
 
+            Console.WriteLine("N-Grams from 'normalized' text...");
             foreach (var nGram in ngrams2)
             {
                 Console.WriteLine(nGram.ToString());

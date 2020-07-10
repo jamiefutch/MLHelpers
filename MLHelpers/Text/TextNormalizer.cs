@@ -12,6 +12,7 @@ namespace MLHelpers.Text
     public class TextNormalizer : IDisposable
     {
         private MLContext _mlContext;
+        // ReSharper disable once CollectionNeverUpdated.Local
         private List<TextData> _emptySamplesList;
         private IDataView _emptyDataView;
         
@@ -27,15 +28,15 @@ namespace MLHelpers.Text
 
         public TextNormalizer(TextNormalizingEstimator.CaseMode caseMode = TextNormalizingEstimator.CaseMode.Lower,
             bool keepDiacritics = false,
-            bool keepPuncuations = false,
+            bool keepPunctuations = false,
             bool keepNumbers = false)
         {
-            InitializeTextNormalizer(caseMode, keepDiacritics, keepPuncuations, keepNumbers);
+            InitializeTextNormalizer(caseMode, keepDiacritics, keepPunctuations, keepNumbers);
         }
 
         private void InitializeTextNormalizer(TextNormalizingEstimator.CaseMode caseMode = TextNormalizingEstimator.CaseMode.Lower,
             bool keepDiacritics = false,
-            bool keepPuncuations = false,
+            bool keepPunctuations = false,
             bool keepNumbers = false)
         {
             _mlContext = new MLContext();
@@ -46,7 +47,7 @@ namespace MLHelpers.Text
             _normTextPipeline = _mlContext.Transforms.Text.NormalizeText("NormalizedText", "Text",
                 caseMode,
                 keepDiacritics: keepDiacritics,
-                keepPunctuations: keepPuncuations,
+                keepPunctuations: keepPunctuations,
                 keepNumbers: keepNumbers);
             _normTextTransformer = _normTextPipeline.Fit(_emptyDataView);
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<TextData, TransformedTextData>(_normTextTransformer);

@@ -8,7 +8,7 @@ namespace MLHelpers.Text
 {
     public class NGrams
     {
-        private readonly MLContext _mlContext;
+        //private readonly MLContext _mlContext;
 
         public List<NGramModel> GenerateNGrams(string inputString)
         {
@@ -47,6 +47,7 @@ namespace MLHelpers.Text
             var prediction = predictionEngine.Predict(strings[0]);
             VBuffer<ReadOnlyMemory<char>> slotNames = default;
             transformedDataView.Schema["NgramFeatures"].GetSlotNames(ref slotNames);
+            // ReSharper disable once InconsistentNaming
             var NgramFeaturesColumn = transformedDataView.GetColumn<VBuffer<float>>(transformedDataView.Schema["NgramFeatures"]);
             var slots = slotNames.GetValues();
             
