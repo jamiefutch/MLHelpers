@@ -4,11 +4,17 @@ using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms.Text;
 
+// ReSharper disable IdentifierTypo
+
 namespace MLHelpers.Text
 {
     public class NGrams
     {
-        //private readonly MLContext _mlContext;
+        
+
+        public NGrams()
+        {
+        }
 
         public List<NGramModel> GenerateNGrams(string inputString)
         {
@@ -24,22 +30,22 @@ namespace MLHelpers.Text
         {   
             return GenerateNGrams(inputStrings.ToArray());
         }
-
+        
         public List<NGramModel> GenerateNGrams(string[] inputStrings, int ngramLength = 3)
         {
             var retList = new List<NGramModel>();
-            
-            var mlContext = new MLContext();
-            var strings = StringsToTextDataList(inputStrings);
-            var dataview = mlContext.Data.LoadFromEnumerable(strings);
-            
-            var textPipeline = mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "Text")
+
+            MLContext mlContext = new MLContext();
+            EstimatorChain<NgramExtractingTransformer> textPipeline = mlContext.Transforms.Text.TokenizeIntoWords("Tokens", "Text")
                 // 'ProduceNgrams' takes key type as input. Converting the tokens into key type using 'MapValueToKey'.
                 .Append(mlContext.Transforms.Conversion.MapValueToKey("Tokens"))
                 .Append(mlContext.Transforms.Text.ProduceNgrams("NgramFeatures", "Tokens",
                     ngramLength: ngramLength,
                     useAllLengths: false,
                     weighting: NgramExtractingEstimator.WeightingCriteria.Tf));
+
+            var strings = StringsToTextDataList(inputStrings);
+            var dataview = mlContext.Data.LoadFromEnumerable(strings);
 
             var textTransformer = textPipeline.Fit(dataview);
             var transformedDataView = textTransformer.Transform(dataview);
