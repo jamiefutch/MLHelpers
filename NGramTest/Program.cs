@@ -10,10 +10,10 @@ namespace NGramTest
         {
             const string kText =
                 "this is a test. this is only a test.  if this had been an actual program it would not have been so dumb";
-            NGrams ngs = new NGrams();
+            NGrams ngs = new NGrams(3);
 
             Console.WriteLine("N-Grams from 'raw' text...");
-            var ngrams = ngs.GenerateNGrams(kText);
+            var ngrams = ngs.GenerateNGramsStrings(kText);
 
             foreach (var nGram in ngrams)
             {
